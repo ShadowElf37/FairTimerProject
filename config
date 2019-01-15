@@ -1,0 +1,15 @@
+# Commands:
+# play [.wav]
+# stop_music
+# countdown [time] [text] {-wait_OFF}
+#           -wait_OFF will allow cues to fire without waiting for the timer to elapse
+# countup [text] {-log_OFF} {-wait_OFF}
+#           -log_OFF will prevent time logging
+#           -wait_OFF will allow cues to fire before someone stops the timer
+
+1: play "MusicA.wav"
+2: countdown 15m "Intermission"
+3: stop_music
+4: play "MusicB.wav"
+5: countup "Act 2"
+6: countup "This is not logged" -log_OFF
