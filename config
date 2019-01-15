@@ -1,15 +1,20 @@
-# Commands:
-# play [.wav]
-# stop_music
-# countdown [time] [text] {-wait_OFF}
-#           -wait_OFF will allow cues to fire without waiting for the timer to elapse
-# countup [text] {-log_OFF} {-wait_OFF}
-#           -log_OFF will prevent time logging
-#           -wait_OFF will allow cues to fire before someone stops the timer
+# StartTime,Duration,Name,Type
+5:00p,2:00,Preshow,Count Down
+-0:12,none,10 minutes,Announce
+-0:07,none,5 minutes,Announce
+-0:02,none,places act 1,Announce
+manual,none,Act 1,Count Up
+manual,0:15,Intermission,Count Down
+-0:07,none,5 minutes act 2,Announce
+-0:02,none,places act 2,Announce
+manual,none,Act 2,Count Up
 
-1: play "MusicA.wav"
-2: countdown 15m "Intermission"
-3: stop_music
-4: play "MusicB.wav"
-5: countup "Act 2"
-6: countup "This is not logged" -log_OFF
+await_time 5:00pm
+prompt "Preshow"
+countdown 20m -12m(play "10 minutes") -7m(play "5 minutes") -2m(play "places act 1") -2m(prompt "Preshow - Places")
+prompt "Act 1"
+countup
+prompt "Intermission"
+countdown 15m -7m(play "5 minutes act 2") -2m(play "places act 2")
+prompt "Act 2"
+countup
