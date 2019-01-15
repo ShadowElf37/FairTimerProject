@@ -1,17 +1,8 @@
-# StartTime,Duration,Name,Type
-5:00p,2:00,Preshow,Count Down
--0:12,none,10 minutes,Announce
--0:07,none,5 minutes,Announce
--0:02,none,places act 1,Announce
-manual,none,Act 1,Count Up
-manual,0:15,Intermission,Count Down
--0:07,none,5 minutes act 2,Announce
--0:02,none,places act 2,Announce
-manual,none,Act 2,Count Up
+# await_time, prompt, countdown, countup, play
 
 await_time 5:00pm
 prompt "Preshow"
-countdown 20m -12m(play "10 minutes") -7m(play "5 minutes") -2m(play "places act 1") -2m(prompt "Preshow - Places")
+countdown 2h -12m(play "10 minutes") -7m(play "5 minutes") -2m(play "places act 1") -2m(prompt "Preshow - Places")
 prompt "Act 1"
 countup
 prompt "Intermission"
