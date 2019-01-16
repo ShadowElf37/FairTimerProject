@@ -10,7 +10,9 @@
 #prompt "Act 2"
 #countup
 
-await_time 7:15pm
+await_time 9:42am
 prompt "gotten"
 countdown 10s -5s(prompt "5s")
 prompt "done"
+
+countup

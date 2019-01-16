@@ -33,6 +33,12 @@ def parse_hms(st):
 
     return hours*3600 + minutes*60 + seconds
 
+def sec_to_hms(sec):
+    m = sec // 60
+    h = m // 60
+    s = sec % 60
+    return '%s:%s.%s' % (h,m,s)
+
 
 class TimedCommand:
     def __init__(self, time, cmdtext):
@@ -59,15 +65,37 @@ class Countdown:
             return True
 
         for tc in self.timed_cmds:
-            if self.t - (time() - self.start) <= tc.time:
+            if self.get_time() <= tc.time:
                 self.timed_cmds.remove(tc)
                 return tc.text
 
         return False
 
+    def get_time(self):
+        return self.t - (time() - self.start)
+
+
     def timed_command(self, time_left, text):
         self.timed_cmds.append(TimedCommand(parse_hms(time_left), text))
 
+    def get_time_str(self):
+        return sec_to_hms(round(self.get_time()))
+
+class DeadTimer:
+    def __init__(self):
+        self.returned = False
+        self.returnval = False
+        self.start = -1
+        self.specialtext = 'Loading...'
+
+    def tick(self):
+        return False
+
+    def get_time(self):
+        return 0
+
+    def get_time_str(self):
+        return self.specialtext
 
 # Countup timer object
 class Countup:
@@ -82,16 +110,22 @@ class Countup:
         if self.start == -1:
             self.start = time()
         if self.returned:
-            self.returnval = time() - self.start
+            self.returnval = self.get_time()
             return True
         return False
+
+    def get_time(self):
+        return time() - self.start
+
+    def get_time_str(self):
+        return sec_to_hms(round(self.get_time()))
 
     def stop(self):
         self.returned = True
         log.write('Timer '+prompt+' - Stopped at' + str(time() - self.start)+', '+timestamp())
 
 
-current_timer = None
+current_timer = DeadTimer()
 prompt = 'Ready.'
 i = 0
 
@@ -102,20 +136,29 @@ root.geometry('%sx%s'%(width,height))
 root.title('Mr. Fair\'s Super Special Timer')
 root.configure(background='black')
 
-time_label = Label(root, fg='white', bg='black', font=('Helvetica', 46))
+time_label = Label(root, fg='white', bg='black', font=('Helvetica', 50))
 time_label.place(x=width/15, y=height/10)
-config_file_label = Label(root, fg='white', bg='black', font=('Helvetica', 28))
-config_file_label.place(x=width/15, y=height/10*2.5)
+config_file_label = Label(root, fg='white', bg='black', font=('Helvetica', 26))
+config_file_label.place(x=width/15, y=height/10*3)
+prompt_label = Label(root, fg='#F31', bg='black', font=('Helvetica', 50))
+prompt_label.place(x=width/15, y=height/10*4)
+timer_label = Label(root, fg='#0FF', bg='black', font=('Helvetica', 80))
+timer_label.place(x=width/15, y=height/10*5)
+timer_type_label = Label(root, fg='white', bg='black', font=('Helvetica', 20))
+timer_type_label.place(x=width/7, y=height/10*6.2)
 
 while True:
     sleep(0.01)
     time_label.configure(text=get_time().replace('am', ' AM').replace('pm', ' PM'))
-    config_file_label.configure(text='Show: '+configfile)
+    config_file_label.configure(text='Loaded: '+configfile)
+    prompt_label.configure(text=prompt)
+    timer_label.configure(text=current_timer.get_time_str())
+    timer_type_label.configure(text='Counting down.' if isinstance(current_timer, Countdown) else 'Counting up.' if isinstance(current_timer, Countup) else 'Holding.')
     try:
         root.update()
         root.update_idletasks()
 
-        if current_timer is None:
+        if isinstance(current_timer, DeadTimer):
             try:
                 cmd = queue[i]
             except IndexError:
@@ -128,6 +171,7 @@ while True:
 
             if c[0] == 'await_time':
                 print('awaiting', c[1])
+                current_timer.specialtext = c[1]
                 if get_time(sec=False).strip('0') != c[1].strip('0'):
                     continue
 
@@ -166,7 +210,7 @@ while True:
                 rv = current_timer.returnval
                 if rv is not 1:
                     log.write(timestamp()+' - '+prompt+' - %d' % rv)
-                current_timer = None
+                current_timer = DeadTimer()
             else:
                 current_timer.returnval = False
                 c = result.split(' ')
