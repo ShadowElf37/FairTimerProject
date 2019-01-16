@@ -2,6 +2,7 @@ from time import time, sleep
 import datetime
 from threading import Thread
 from tkinter import *
+from tkinter import filedialog
 from sys import exit
 import audio
 
@@ -90,11 +91,11 @@ class Countup:
         log.write('Timer '+prompt+' - Stopped at' + str(time() - self.start)+', '+timestamp())
 
 
-root = Tk()
 current_timer = None
 prompt = 'Ready.'
 i = 0
 
+root = Tk()
 width = 1000
 height = 700
 root.geometry('%sx%s'%(width,height))
