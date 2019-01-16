@@ -3,6 +3,7 @@ import datetime
 from threading import Thread
 from tkinter import *
 from sys import exit
+import audio
 
 # Read Config
 queue = open('config', 'r').read().split('\n')
@@ -144,6 +145,7 @@ while True:
             elif c[0] == 'play':
                 print('played sound')
                 f = cmd[cmd.find('"'):cmd.find('"', cmd.find('"')+1)]
+                Thread(target=audio.play_wav, args=(f,)).start()
 
             i += 1
 
@@ -164,8 +166,9 @@ while True:
                     print('$ prompt changed:', prompt)
                 
                 elif c[0] == 'play':
-                    f = c[1][c[1].find('"'):c[1].find('"', c[1].find('"')+1)]
                     print('$ played sound')
+                    f = c[1][c[1].find('"'):c[1].find('"', c[1].find('"')+1)]
+                    Thread(target=audio.play_wav, args=(f,)).start()
 
     except (KeyboardInterrupt, SystemExit, TclError):
         print('Application destroyed.')
