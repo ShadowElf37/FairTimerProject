@@ -10,11 +10,11 @@ log = open('log', 'a')
 
 
 def get_time(sec=True):
-    return datetime.datetime.now().strftime('%H:%M'+(':%S' if sec else '')+'%p').lower()
+    return str(datetime.datetime.now().strftime('%I:%M'+(':%S' if sec else '')+'%p').lower())
 def get_date():
-    return datetime.datetime.now().strftime('%d/%m/%Y')
+    return str(datetime.datetime.now().strftime('%d/%m/%Y'))
 def timestamp():
-    return datetime.datetime.now()
+    return str(datetime.datetime.now())
 
 def parse_hms(st):
     h = st.find('h')
@@ -57,6 +57,7 @@ class Countdown:
 
         for tc in self.timed_cmds:
             if self.t - (time() - self.start) <= tc.time:
+                self.timed_cmds.remove(tc)
                 return tc.text
 
         return False
@@ -84,12 +85,19 @@ class Countup:
 
     def stop(self):
         self.returned = True
+        log.write('Timer '+prompt+' - Stopped at' + str(time() - self.start)+', '+timestamp())
 
 
 root = Tk()
 current_timer = None
 prompt = 'Ready.'
 i = 0
+
+width = 1000
+height = 700
+root.geometry('%sx%s'%(width,height))
+root.title('Mr. Fair\'s Super Special Timer')
+root.configure(background='black')
 
 while True:
     sleep(0.01)
@@ -98,30 +106,43 @@ while True:
         root.update_idletasks()
 
         if current_timer is None:
-            cmd = queue[i]
+            try:
+                cmd = queue[i]
+            except IndexError:
+                break
+
+            if not cmd or cmd[0] == '#':
+                i += 1
+                continue
             c = cmd.split(' ')
 
             if c[0] == 'await_time':
-                if get_time(sec=False) != c[1]:
+                print('awaiting', c[1])
+                if get_time(sec=False).strip('0') != c[1].strip('0'):
                     continue
+
             elif c[0] == 'prompt':
-                prompt = cmd[cmd.find('"'):cmd.find('"', cmd.find('"')+1)]
+                prompt = cmd[cmd.find('"')+1:cmd.find('"', cmd.find('"')+1)]
+                print('prompt changed:', prompt)
 
             elif c[0] == 'countdown': # MUST SET UP
+                print('created countdown')
                 current_timer = Countdown(parse_hms(c[1]))
                 extras = cmd.split('-')[1:]
                 for arg in extras:
-                    time = arg[:arg.find('(')]
-                    s = arg[arg.find('('):arg.find(')', arg.find(')')+1)]
+                    t = arg[:arg.find('(')]
+                    s = arg[arg.find('(')+1:arg.find(')', arg.find(')')+1)]
                     
-                    current_timer.timed_command(time, s)
+                    current_timer.timed_command(t, s)
                 holding = True
 
             elif c[0] == 'countup':
+                print('created countup')
                 current_timer = Countup()
                 holding = True
 
             elif c[0] == 'play':
+                print('played sound')
                 f = cmd[cmd.find('"'):cmd.find('"', cmd.find('"')+1)]
 
             i += 1
@@ -136,15 +157,20 @@ while True:
                     log.write(timestamp()+' - '+prompt+' - %d' % rv)
                 current_timer = None
             else:
+                current_timer.returnval = False
                 c = result.split(' ')
                 if c[0] == 'prompt':
-                    prompt = cmd[cmd.find('"'):cmd.find('"', cmd.find('"')+1)]
+                    prompt = c[1][c[1].find('"')+1:c[1].find('"', c[1].find('"')+1)]
+                    print('$ prompt changed:', prompt)
                 
                 elif c[0] == 'play':
-                    f = cmd[cmd.find('"'):cmd.find('"', cmd.find('"')+1)]
+                    f = c[1][c[1].find('"'):c[1].find('"', c[1].find('"')+1)]
+                    print('$ played sound')
 
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, SystemExit, TclError):
+        print('Application destroyed.')
         break
 
-root.destroy()
-exit()
+# root.destroy()
+print('Process complete.')
+exit(0)
