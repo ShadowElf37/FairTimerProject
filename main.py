@@ -6,12 +6,13 @@ from sys import exit
 import audio
 
 # Read Config
-queue = open('config', 'r').read().split('\n')
+configfile = 'config'
+queue = open(configfile, 'r').read().split('\n')
 log = open('log', 'a')
 
 
 def get_time(sec=True):
-    return str(datetime.datetime.now().strftime('%I:%M'+(':%S' if sec else '')+'%p').lower())
+    return str(datetime.datetime.now().strftime('%I:%M'+('.%S' if sec else '')+'%p').lower())
 def get_date():
     return str(datetime.datetime.now().strftime('%d/%m/%Y'))
 def timestamp():
@@ -100,8 +101,15 @@ root.geometry('%sx%s'%(width,height))
 root.title('Mr. Fair\'s Super Special Timer')
 root.configure(background='black')
 
+time_label = Label(root, fg='white', bg='black', font=('Helvetica', 46))
+time_label.place(x=width/15, y=height/10)
+config_file_label = Label(root, fg='white', bg='black', font=('Helvetica', 28))
+config_file_label.place(x=width/15, y=height/10*2.5)
+
 while True:
     sleep(0.01)
+    time_label.configure(text=get_time().replace('am', ' AM').replace('pm', ' PM'))
+    config_file_label.configure(text='Show: '+configfile)
     try:
         root.update()
         root.update_idletasks()
