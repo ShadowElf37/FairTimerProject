@@ -4,7 +4,7 @@ import sys
 
 CHUNK = 1024
 # Yes I stole this code from a website
-sound_folder = '/'
+sound_folder = 'ShowFiles/audio/'
 
 
 def play_wav(fname):

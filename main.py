@@ -7,10 +7,11 @@ from sys import exit
 import audio
 
 # Read Config
-configfile = 'default_config.cfg'
+configfile = filedialog.askopenfilename(initialdir="ShowFiles/", title="Select config file",
+                                                 filetypes=(("config files", "*.cfg"), ("all files", "*.*")))
+    #f = param_entry.get()#'default_config.cfg'
 queue = open(configfile, 'r').read().split('\n')
-log = open('default_log.log', 'a')
-audiofolder = '/'
+audiofolder = 'ShowFiles/audio/'
 
 
 def get_time(sec=True):
@@ -19,6 +20,8 @@ def get_date():
     return str(datetime.datetime.now().strftime('%d/%m/%Y'))
 def timestamp():
     return str(datetime.datetime.now())
+
+log = open('ShowFiles/logs/log_'+timestamp()+'.log', 'a')
 
 def parse_hms(st):
     h = st.find('h')
@@ -180,7 +183,7 @@ def load_cfg():
     global configfile, queue, i, current_timer
     current_timer = DeadTimer()
     i = 0
-    configfile = filedialog.askopenfilename(initialdir="/", title="Select file",
+    configfile = filedialog.askopenfilename(initialdir="ShowFiles/", title="Select file",
                                                filetypes=(("cfg files", "*.cfg"), ("all files", "*.*")))
     #configfile = param_entry.get()
     queue = open(configfile, 'r').read().split('\n')
@@ -190,7 +193,7 @@ def load_cfg():
 def switch_logfile():
     global log
     log.close()
-    f = filedialog.askopenfilename(initialdir="/", title="Select file",
+    f = filedialog.askopenfilename(initialdir="ShowFiles/", title="Select file",
                                                  filetypes=(("log files", "*.log"), ("all files", "*.*")))
     #f = param_entry.get()
     log = open(f, 'a')
