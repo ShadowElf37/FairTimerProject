@@ -7,9 +7,9 @@ from sys import exit
 import audio
 
 # Read Config
-configfile = 'config.cfg'
+configfile = 'default_config.cfg'
 queue = open(configfile, 'r').read().split('\n')
-log = open('log.log', 'a')
+log = open('default_log.log', 'a')
 audiofolder = '/'
 
 
