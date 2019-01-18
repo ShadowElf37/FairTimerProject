@@ -8,7 +8,7 @@ import os
 import audio
 
 project_dir = os.getcwd()
-showfiles = project_dir+'/ShowFiles/'
+showfiles = project_dir+'\\ShowFiles\\'
 
 # Read Config
 root = Tk()
@@ -17,7 +17,7 @@ configfile = filedialog.askopenfilename(initialdir=showfiles, title="Select conf
 root.destroy()
     #f = param_entry.get()#'default_config.cfg'
 queue = open(configfile, 'r').read().split('\n')
-audiofolder = default_audiofolder = showfiles+'audio/'
+audiofolder = default_audiofolder = showfiles+'audio\\'
 
 
 def get_time(sec=True):
@@ -27,7 +27,7 @@ def get_date():
 def timestamp():
     return str(datetime.datetime.now())
 
-log = open('ShowFiles/logs/log_'+timestamp().replace(':', ';')+'.log', 'a')
+log = open('ShowFiles\\logs\\log_'+timestamp().replace(':', ';')+'.log', 'a')
 
 def parse_hms(st):
     h = st.find('h')
@@ -322,7 +322,7 @@ while True:
 
             elif c[0] == 'play':
                 print('played sound')
-                f = audiofolder+cmd[cmd.find('"'):cmd.find('"', cmd.find('"')+1)]
+                f = audiofolder+cmd[cmd.find('"')+1:cmd.find('"', cmd.find('"')+1)]
                 Thread(target=audio.play_wav, args=(f,)).start()
 
             i += 1
@@ -345,7 +345,7 @@ while True:
                 
                 elif c[0] == 'play':
                     print('$ played sound')
-                    f = audiofolder+c[1][c[1].find('"'):c[1].find('"', c[1].find('"')+1)]
+                    f = audiofolder+c[1][c[1].find('"')+1:c[1].find('"', c[1].find('"')+1)]
                     Thread(target=audio.play_wav, args=(f,)).start()
 
     except (KeyboardInterrupt, SystemExit, TclError):
