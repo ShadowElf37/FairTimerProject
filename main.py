@@ -4,14 +4,20 @@ from threading import Thread
 from tkinter import *
 from tkinter import filedialog
 from sys import exit
+import os
 import audio
 
+project_dir = os.getcwd()
+showfiles = project_dir+'/ShowFiles/'
+
 # Read Config
-configfile = filedialog.askopenfilename(initialdir="ShowFiles/", title="Select config file",
+root = Tk()
+configfile = filedialog.askopenfilename(initialdir=showfiles, title="Select config file",
                                                  filetypes=(("config files", "*.cfg"), ("all files", "*.*")))
+root.destroy()
     #f = param_entry.get()#'default_config.cfg'
 queue = open(configfile, 'r').read().split('\n')
-audiofolder = 'ShowFiles/audio/'
+audiofolder = default_audiofolder = showfiles+'audio/'
 
 
 def get_time(sec=True):
@@ -21,7 +27,7 @@ def get_date():
 def timestamp():
     return str(datetime.datetime.now())
 
-log = open('ShowFiles/logs/log_'+timestamp()+'.log', 'a')
+log = open('ShowFiles/logs/log_'+timestamp().replace(':', ';')+'.log', 'a')
 
 def parse_hms(st):
     h = st.find('h')
@@ -159,6 +165,7 @@ current_timer = DeadTimer()
 prompt = 'No prompt set yet.'
 i = 0
 paused = False
+skipped = False
 
 root = Tk()
 width = 1000
@@ -181,27 +188,37 @@ timer_type_label.place(x=width/14, y=height/10*5.7)
 
 def load_cfg():
     global configfile, queue, i, current_timer
-    current_timer = DeadTimer()
-    i = 0
-    configfile = filedialog.askopenfilename(initialdir="ShowFiles/", title="Select file",
+    temp = configfile
+    configfile = filedialog.askopenfilename(initialdir=showfiles, title="Select file",
                                                filetypes=(("cfg files", "*.cfg"), ("all files", "*.*")))
     #configfile = param_entry.get()
+    if not configfile:
+        configfile = temp
+    current_timer = DeadTimer()
+    i = 0
     queue = open(configfile, 'r').read().split('\n')
     configfile = configfile.split('/')[-1]
     print('cfg file set')
 
 def switch_logfile():
     global log
+    temp = log.name
     log.close()
-    f = filedialog.askopenfilename(initialdir="ShowFiles/", title="Select file",
+    f = filedialog.askopenfilename(initialdir=showfiles, title="Select file",
                                                  filetypes=(("log files", "*.log"), ("all files", "*.*")))
     #f = param_entry.get()
+    if not f:
+        log = open(temp, 'a')
+        return
     log = open(f, 'a')
     print('log file set')
 
 def find_audio():
     global audiofolder
     audiofolder = filedialog.askdirectory()
+    if not audiofolder:
+        audiofolder = default_audiofolder
+        return
     print('audio folder set')
 
 def pause():
@@ -210,13 +227,15 @@ def pause():
     current_timer.pause()
 
 def resume():
-    global paused, current_timer
+    global paused, current_timer, skipped
     paused = False
     current_timer.unpause()
+    skipped = False
 
 def skip():
-    global i, current_timer, paused
+    global i, current_timer, paused, skipped
     paused = False
+    skipped = True
     if isinstance(current_timer, DeadTimer): i += 1
     current_timer = DeadTimer()
 
@@ -245,7 +264,7 @@ skip_button.place(x=width/8*6, y=height/11*9, anchor=CENTER)
 while True:
     sleep(0.01)
     time_label.configure(text=get_time().replace('am', ' AM').replace('pm', ' PM'))
-    config_file_label.configure(text='Loaded: '+configfile)
+    config_file_label.configure(text='Loaded: '+configfile.split('/')[-1])
     prompt_label.configure(text=prompt)
     timer_label.configure(text=current_timer.get_time_str())
     timer_type_label.configure(text=('Counting down.' if isinstance(current_timer, Countdown) else 'Counting up.' if isinstance(current_timer, Countup) else 'Holding.') + ' (Line %s)' % i)
@@ -253,8 +272,13 @@ while True:
     if isinstance(current_timer, Countup):
         skip_button.configure(text='Stop', command=stop)
     pause_button.configure(text='Pause', command=pause)
-    if paused:
+    if skipped and not isinstance(current_timer, DeadTimer) and not paused:
+        pause()
+    if skipped and not isinstance(current_timer, DeadTimer):
+        pause_button.configure(text='Start', command=resume)
+    elif paused and not skipped:
         pause_button.configure(text='Resume', command=resume)
+
     try:
         root.update()
         root.update_idletasks()

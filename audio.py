@@ -4,11 +4,9 @@ import sys
 
 CHUNK = 1024
 # Yes I stole this code from a website
-sound_folder = 'ShowFiles/audio/'
-
 
 def play_wav(fname):
-    wf = wave.open(sound_folder + fname, 'rb')
+    wf = wave.open(fname, 'rb')
 
     # instantiate PyAudio (1)
     p = pyaudio.PyAudio()
