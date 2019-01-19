@@ -27,7 +27,7 @@ def get_date():
 def timestamp():
     return str(datetime.datetime.now())
 
-log = open('ShowFiles\\logs\\log_'+timestamp().replace(':', ';')+'.log', 'a')
+log = open('ShowFiles\\logs\\log_'+timestamp().replace(':', ';')[:timestamp().find('.')]+'.log', 'a')
 
 def parse_hms(st):
     h = st.find('h')
@@ -180,8 +180,8 @@ config_file_label = Label(root, fg='white', bg='black', font=('Helvetica', 26))
 config_file_label.place(x=width/15, y=height/10*3)
 prompt_label = Label(root, fg='#F00', bg='black', font=('Helvetica', 50))
 prompt_label.place(x=width/15, y=height/10*4)
-timer_label = Label(root, fg='#02F', bg='black', font=('Helvetica', 80))
-timer_label.place(x=width/15, y=height/10*6)
+timer_label = Label(root, fg='#02F', bg='black', font=('Helvetica', 100))
+timer_label.place(x=width/15, y=height/10*6.7)
 timer_type_label = Label(root, fg='white', bg='black', font=('Helvetica', 20))
 timer_type_label.place(x=width/14, y=height/10*5.7)
 
@@ -248,14 +248,14 @@ def stop():
 bw = 10
 load_cfg_button = Button(root, text="Load Config", font=('Helvetica', 18), width=bw, command=load_cfg)
 load_cfg_button.place(x=width/8*6, y=height/11*3, anchor=CENTER)
-check_logs_button = Button(root, text="Set Log", font=('Helvetica', 18), width=bw, command=switch_logfile)
-check_logs_button.place(x=width/8*6, y=height/11*5, anchor=CENTER)
-find_audio_button = Button(root, text="Find Audio", font=('Helvetica', 18), width=bw, command=find_audio)
-find_audio_button.place(x=width/8*6, y=height/11*1, anchor=CENTER)
+#check_logs_button = Button(root, text="Set Log", font=('Helvetica', 18), width=bw, command=switch_logfile)
+#check_logs_button.place(x=width/8*6, y=height/11*5, anchor=CENTER)
+#find_audio_button = Button(root, text="Find Audio", font=('Helvetica', 18), width=bw, command=find_audio)
+#find_audio_button.place(x=width/8*6, y=height/11*1, anchor=CENTER)
 pause_button = Button(root, text="Pause", font=('Helvetica', 18), width=bw)
-pause_button.place(x=width/8*6, y=height/11*7, anchor=CENTER)
+pause_button.place(x=width/8*6, y=height/11*5, anchor=CENTER)
 skip_button = Button(root, text="Skip", font=('Helvetica', 18), width=bw)
-skip_button.place(x=width/8*6, y=height/11*9, anchor=CENTER)
+skip_button.place(x=width/8*6, y=height/11*7, anchor=CENTER)
 
 # param_entry = Entry(root, width=30, font=('Lucida Console', 14))
 # param_entry.place(x=width/8*6, y=height/11*10, anchor=CENTER)
@@ -340,12 +340,12 @@ while True:
                 current_timer.returnval = False
                 c = result.split(' ')
                 if c[0] == 'prompt':
-                    prompt = c[1][c[1].find('"')+1:c[1].find('"', c[1].find('"')+1)]
+                    prompt = result[result.find('"')+1:result.find('"', result.find('"')+1)]
                     print('$ prompt changed:', prompt)
                 
                 elif c[0] == 'play':
                     print('$ played sound')
-                    f = audiofolder+c[1][c[1].find('"')+1:c[1].find('"', c[1].find('"')+1)]
+                    f = audiofolder+result[result.find('"')+1:result.find('"', result.find('"')+1)]
                     Thread(target=audio.play_wav, args=(f,)).start()
 
     except (KeyboardInterrupt, SystemExit, TclError):
