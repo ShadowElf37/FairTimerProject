@@ -6,12 +6,16 @@ from tkinter import filedialog
 from sys import exit
 import os
 import audio
+from traceback import format_exc
 
 project_dir = os.getcwd()
 showfiles = project_dir+'\\ShowFiles\\'
+ico = project_dir+'\\favicon.ico'
 
 # Read Config
 root = Tk()
+root.title('temp')
+root.withdraw()
 configfile = filedialog.askopenfilename(initialdir=showfiles, title="Select config file",
                                                  filetypes=(("config files", "*.cfg"), ("all files", "*.*")))
 root.destroy()
@@ -173,6 +177,7 @@ height = 700
 root.geometry('%sx%s'%(width,height))
 root.title('Mr. Fair\'s Super Special Timer')
 root.configure(background='black')
+root.iconbitmap(ico)
 
 time_label = Label(root, fg='#0F0', bg='black', font=('Helvetica', 50))
 time_label.place(x=width/15, y=height/10)
@@ -261,6 +266,13 @@ skip_button.place(x=width/8*6, y=height/11*7, anchor=CENTER)
 # param_entry.place(x=width/8*6, y=height/11*10, anchor=CENTER)
 # param_entry.insert(0, 'Enter file names here')
 
+error_msg = None
+def error_msg_close():
+    global error_msg
+    error_msg.destroy()
+    root.focus_force()
+    error_msg = None
+
 while True:
     sleep(0.01)
     time_label.configure(text=get_time().replace('am', ' AM').replace('pm', ' PM'))
@@ -282,6 +294,9 @@ while True:
     try:
         root.update()
         root.update_idletasks()
+        if error_msg:
+            error_msg.update()
+            error_msg.update_idletasks()
 
         if isinstance(current_timer, DeadTimer):
             try:
@@ -325,7 +340,8 @@ while True:
                 f = audiofolder+cmd[cmd.find('"')+1:cmd.find('"', cmd.find('"')+1)]
                 Thread(target=audio.play_wav, args=(f,)).start()
 
-            i += 1
+            else:
+                raise SyntaxError('This config line may be invalid: "'+cmd+'"')
 
         elif current_timer:
             result = current_timer.tick()
@@ -351,6 +367,18 @@ while True:
     except (KeyboardInterrupt, SystemExit, TclError):
         print('Application destroyed.')
         break
+
+    except Exception as e:
+        error_msg = Tk()
+        error_msg.protocol("WM_DELETE_WINDOW", error_msg_close)
+        error_msg.focus()
+        error_msg.title('Mr. Fair\'s Super Special ERROR')
+        error = Label(error_msg,
+                      text='An error occurred!\nMake sure your config files are in order.\nIf the problem persists, contact Yovel and send him a screenshot so he can investigate the issue.\n\n'+format_exc(),
+                      fg="red", font=('Lucida Console', 12))
+        error.pack()
+
+    i += 1
 
 # root.destroy()
 print('Process complete.')
