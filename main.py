@@ -178,6 +178,7 @@ root.geometry('%sx%s'%(width,height))
 root.title('Mr. Fair\'s Super Special Timer')
 root.configure(background='black')
 root.iconbitmap(ico)
+root.focus()
 
 time_label = Label(root, fg='#0F0', bg='black', font=('Helvetica', 50))
 time_label.place(x=width/15, y=height/10)

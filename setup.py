@@ -19,4 +19,4 @@ setup(
     version="1.1",
     description="Yovel made this, not you.",
     options={"build_exe": build_exe_options},
-    executables=[Executable("main.py", base=base)])
+    executables=[Executable("main.py", base=base, icon='favicon.ico')])
