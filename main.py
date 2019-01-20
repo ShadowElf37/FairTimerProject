@@ -323,6 +323,7 @@ while True:
 
             if not cmd or cmd[0] == '#':
                 i += 1
+                #print('@', i)
                 continue
             c = cmd.split(' ')
 
@@ -379,7 +380,7 @@ while True:
                     f = audiofolder+result[result.find('"')+1:result.find('"', result.find('"')+1)]
                     Thread(target=audio.play_wav, args=(f,)).start()
 
-                continue
+            continue
 
     except (KeyboardInterrupt, SystemExit, TclError):
         print('Application destroyed.')
@@ -396,6 +397,7 @@ while True:
         error.pack()
 
     i += 1
+    #print(i)
 
 # root.destroy()
 print('Process complete.')
