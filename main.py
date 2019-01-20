@@ -7,10 +7,11 @@ from sys import exit
 import os
 import audio
 from traceback import format_exc
+from math import floor
 
 project_dir = os.getcwd()
 showfiles = project_dir+'\\ShowFiles\\'
-ico = project_dir+'\\favicon.ico'
+ico = project_dir+'\\bin\\favicon.ico'
 
 # Read Config
 root = Tk()
@@ -29,9 +30,10 @@ def get_time(sec=True):
 def get_date():
     return str(datetime.datetime.now().strftime('%d/%m/%Y'))
 def timestamp():
-    return str(datetime.datetime.now())
+    now = str(datetime.datetime.now())
+    return now[:now.find('.')]
 
-log = open('ShowFiles\\logs\\log_'+timestamp().replace(':', ';')[:timestamp().find('.')]+'.log', 'a')
+log = open('ShowFiles\\logs\\log_'+timestamp().replace(':', ';')+'.log', 'a')
 
 def parse_hms(st):
     h = st.find('h')
@@ -75,7 +77,7 @@ class Countdown:
         if self.returnval:
             return
         if self.start == -1:
-            self.start = round(time())
+            self.start = floor(time())
             self.pause_time = self.start
         if time() - self.start >= self.t and not paused:
             self.returned = True
@@ -92,14 +94,14 @@ class Countdown:
     def get_time(self):
         global paused
         if not paused:
-            return self.t - (time() - self.start)
+            return self.t - (floor(time()) - self.start)
         return self.t - self.pause_time + self.start
 
     def pause(self):
-        self.pause_time = time()
+        self.pause_time = floor(time())
 
     def unpause(self):
-        self.start += time() - self.pause_time
+        self.start += floor(time()) - self.pause_time
 
     def timed_command(self, time_left, text):
         self.timed_cmds.append(TimedCommand(parse_hms(time_left), text))
@@ -138,7 +140,7 @@ class Countup:
         if self.returnval:
             return
         if self.start == -1:
-            self.start = time()
+            self.start = round(time())
             self.pause_time = self.start
         if self.returned:
             self.returnval = self.get_time()
@@ -146,23 +148,31 @@ class Countup:
         return False
 
     def pause(self):
-        self.pause_time = time()
+        self.pause_time = floor(time())
 
     def unpause(self):
-        self.start += time() - self.pause_time
+        self.start += floor(time()) - self.pause_time
 
     def get_time(self):
         global paused
         if not paused:
-            return time() - self.start
-        return self.pause_time - self.start
+            return floor(time()) - self.start
+        return floor(self.pause_time) - self.start
 
     def get_time_str(self):
-        return sec_to_hms(round(self.get_time()))
+        return sec_to_hms(self.get_time())
 
     def stop(self):
         self.returned = True
-        log.write('Timer with prompt "'+prompt+'" - Stopped at ' + str(round(self.get_time(), 2))+', '+timestamp()+'; line %s\n' % i)
+        # "Act 2" - Stopped at 1 hour 12 minutes, 2019-01-19 17:38
+        sec = round(self.get_time())
+        ms = str(sec - self.get_time())[1:3]
+        m = sec // 60
+        h = m // 60
+        h = h % 24
+        m = m % 60
+        s = sec % 60
+        log.write(('"'+prompt+'" - Stopped at %s hours, %s minutes, and %s%s seconds on ' % (h,m,s,ms)) + timestamp() + '. Line %s.\n' % i)
 
 
 current_timer = DeadTimer()
@@ -178,7 +188,7 @@ root.geometry('%sx%s'%(width,height))
 root.title('Mr. Fair\'s Super Special Timer')
 root.configure(background='black')
 root.iconbitmap(ico)
-root.focus()
+root.focus_force()
 
 time_label = Label(root, fg='#0F0', bg='black', font=('Helvetica', 50))
 time_label.place(x=width/15, y=height/10)
@@ -253,19 +263,23 @@ def stop():
 
 bw = 10
 load_cfg_button = Button(root, text="Load Config", font=('Helvetica', 18), width=bw, command=load_cfg)
-load_cfg_button.place(x=width/8*6, y=height/11*3, anchor=CENTER)
+load_cfg_button.place(x=width/8*6, y=height/11*6.5, anchor=CENTER)
 #check_logs_button = Button(root, text="Set Log", font=('Helvetica', 18), width=bw, command=switch_logfile)
 #check_logs_button.place(x=width/8*6, y=height/11*5, anchor=CENTER)
 #find_audio_button = Button(root, text="Find Audio", font=('Helvetica', 18), width=bw, command=find_audio)
 #find_audio_button.place(x=width/8*6, y=height/11*1, anchor=CENTER)
 pause_button = Button(root, text="Pause", font=('Helvetica', 18), width=bw)
-pause_button.place(x=width/8*6, y=height/11*5, anchor=CENTER)
+pause_button.place(x=width/8*6, y=height/11*7.75, anchor=CENTER)
 skip_button = Button(root, text="Skip", font=('Helvetica', 18), width=bw)
-skip_button.place(x=width/8*6, y=height/11*7, anchor=CENTER)
+skip_button.place(x=width/8*6, y=height/11*9, anchor=CENTER)
 
 # param_entry = Entry(root, width=30, font=('Lucida Console', 14))
 # param_entry.place(x=width/8*6, y=height/11*10, anchor=CENTER)
 # param_entry.insert(0, 'Enter file names here')
+
+fair_img = PhotoImage(file=project_dir+'\\bin\\favicon.ppm')
+fair_img_label = Label(image=fair_img, width=194, height=194)
+fair_img_label.place(x=width/8*6, y=150, anchor=CENTER)
 
 error_msg = None
 def error_msg_close():
@@ -276,6 +290,7 @@ def error_msg_close():
 
 while True:
     sleep(0.01)
+
     time_label.configure(text=get_time().replace('am', ' AM').replace('pm', ' PM'))
     config_file_label.configure(text='Loaded: '+configfile.split('/')[-1])
     prompt_label.configure(text=prompt)
@@ -293,6 +308,7 @@ while True:
         pause_button.configure(text='Resume', command=resume)
 
     try:
+        fps = 24
         root.update()
         root.update_idletasks()
         if error_msg:
@@ -320,7 +336,7 @@ while True:
                 prompt = cmd[cmd.find('"')+1:cmd.find('"', cmd.find('"')+1)]
                 print('prompt changed:', prompt)
 
-            elif c[0] == 'countdown': # MUST SET UP
+            elif c[0] == 'countdown':
                 print('created countdown')
                 current_timer = Countdown(parse_hms(c[1]))
                 extras = cmd.split('$')[1:]
@@ -350,8 +366,6 @@ while True:
                 continue
             elif result is True:
                 rv = current_timer.returnval
-                #if rv is not 1:
-                #    log.write('\n'+timestamp()+' - '+prompt+' - %d' % rv)
                 current_timer = DeadTimer()
             else:
                 current_timer.returnval = False
@@ -364,6 +378,8 @@ while True:
                     print('$ played sound')
                     f = audiofolder+result[result.find('"')+1:result.find('"', result.find('"')+1)]
                     Thread(target=audio.play_wav, args=(f,)).start()
+
+                continue
 
     except (KeyboardInterrupt, SystemExit, TclError):
         print('Application destroyed.')
