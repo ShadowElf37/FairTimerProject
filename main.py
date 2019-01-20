@@ -347,11 +347,15 @@ while True:
                     
                     current_timer.timed_command(t, s)
                 holding = True
+                #pause()
+                skipped = True
 
             elif c[0] == 'countup':
                 print('created countup')
                 current_timer = Countup()
                 holding = True
+                #pause()
+                skipped = True
 
             elif c[0] == 'play':
                 print('played sound')
