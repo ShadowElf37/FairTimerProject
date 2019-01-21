@@ -341,21 +341,30 @@ while True:
                 print('created countdown')
                 current_timer = Countdown(parse_hms(c[1]))
                 extras = cmd.split('$')[1:]
-                for arg in extras:
-                    t = arg[:arg.find('(')]
-                    s = arg[arg.find('(')+1:arg.find(')', arg.find(')')+1)]
-                    
-                    current_timer.timed_command(t, s)
-                holding = True
-                #pause()
+                oskipped = skipped
                 skipped = True
+                for arg in extras:
+                    if arg.find('(') != -1:
+                        t = arg[:arg.find('(')]
+                        s = arg[arg.find('(')+1:arg.find(')', arg.find(')')+1)]
+                        current_timer.timed_command(t, s)
+                    else:
+                        if arg.strip() == 'auto':
+                            if not oskipped:
+                                skipped = False
+                holding = True
 
             elif c[0] == 'countup':
                 print('created countup')
                 current_timer = Countup()
                 holding = True
-                #pause()
+                opts = cmd.split('$')[1:]
+                oskipped = skipped
                 skipped = True
+                for opt in opts:
+                    if opt.strip() == 'auto':
+                        if not oskipped:
+                            skipped = False
 
             elif c[0] == 'play':
                 print('played sound')
