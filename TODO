@@ -1,0 +1,9 @@
+[x]  1.  Thanks for the photo love...but this will hopefully long outlast me so let's ditch that.  Aiming for lots of black on the screen.  As far as the icon goes, attached is an option.
+[x]  2.  On a similar front...please change the program name from "Mr. Fair's Super Special Timer" to "Stage Timer"
+[ ]  3.  Is dynamic centering an option?  This will ultimately be run full-screen and it would be ideal for the "real clock" to be centered...and maybe the other content shifts toward center while remaining left-justified?
+[x]  4.  "real clock"...this is the primary most important thing on the screen.  Please make this font even larger than the current timer font.
+[x]  5.  Rather than "loaded:" for the active config, please change that label to "Show:" and make this font much smaller.  This is really not important info 99% of the time.
+[x]  6.  Maybe change "load config" to "load show" and make the button much smaller and put it next to the label of the currently active show file.
+[x]  7.  Can the label for the current "Action" be moved closer to the timer and maybe remove the line number reference (useful for debugging, but not so much once this is in production use).
+[x]  8.  Please change the separator between minutes and seconds on both the clock and the timer be changed from ":" to "."
+[ ]  9.  Not sure if this last one is possible or not...but is there a way to make the program title bar black (or at least a much darker grey) rather than the default light grey color that windows gives it?

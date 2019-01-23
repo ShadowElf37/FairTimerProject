@@ -26,7 +26,7 @@ audiofolder = default_audiofolder = showfiles+'audio\\'
 
 
 def get_time(sec=True):
-    return str(datetime.datetime.now().strftime('%I:%M'+(':%S' if sec else '')+'%p').lower())
+    return str(datetime.datetime.now().strftime('%I:%M'+('.%S' if sec else '')+'%p').lower())
 def get_date():
     return str(datetime.datetime.now().strftime('%d/%m/%Y'))
 def timestamp():
@@ -55,7 +55,7 @@ def sec_to_hms(sec):
     h = h % 24
     m = m % 60
     s = sec % 60
-    return '%02d:%02d:%02d' % (h,m,s)
+    return '%02d:%02d.%02d' % (h,m,s)
 
 
 class TimedCommand:
@@ -185,21 +185,21 @@ root = Tk()
 width = 1000
 height = 700
 root.geometry('%sx%s'%(width,height))
-root.title('Mr. Fair\'s Super Special Timer')
+root.title('Stage Timer')
 root.configure(background='black')
 root.iconbitmap(ico)
 root.focus_force()
 
 time_label = Label(root, fg='#0F0', bg='black', font=('Helvetica', 50))
-time_label.place(x=width/15, y=height/10)
-config_file_label = Label(root, fg='white', bg='black', font=('Helvetica', 26))
-config_file_label.place(x=width/15, y=height/10*3)
+time_label.place(x=width/2, y=height/10*2, anchor=CENTER)
 prompt_label = Label(root, fg='#F00', bg='black', font=('Helvetica', 50))
-prompt_label.place(x=width/15, y=height/10*4)
-timer_label = Label(root, fg='#02F', bg='black', font=('Helvetica', 100))
-timer_label.place(x=width/15, y=height/10*6.7)
+prompt_label.place(x=width/2, y=height/10*7, anchor=CENTER)
+timer_label = Label(root, fg='#02F', bg='black', font=('Helvetica', 160))
+timer_label.place(x=width/2, y=height/2*0.9, anchor=CENTER)
+config_file_label = Label(root, fg='white', bg='black', font=('Helvetica', 16))
+config_file_label.place(x=width/2, y=height/10*8, anchor=CENTER)
 timer_type_label = Label(root, fg='white', bg='black', font=('Helvetica', 20))
-timer_type_label.place(x=width/14, y=height/10*5.7)
+timer_type_label.place(x=width/2, y=height/10*6, anchor=CENTER)
 
 
 def load_cfg():
@@ -262,16 +262,16 @@ def stop():
     current_timer = DeadTimer()
 
 bw = 10
-load_cfg_button = Button(root, text="Load Config", font=('Helvetica', 18), width=bw, command=load_cfg)
-load_cfg_button.place(x=width/8*6, y=height/11*6.5, anchor=CENTER)
+load_cfg_button = Button(root, text="Load Show", font=('Helvetica', 8), width=bw, command=load_cfg)
+load_cfg_button.place(x=width/2, y=height/10*8.5, anchor=CENTER)
 #check_logs_button = Button(root, text="Set Log", font=('Helvetica', 18), width=bw, command=switch_logfile)
 #check_logs_button.place(x=width/8*6, y=height/11*5, anchor=CENTER)
 #find_audio_button = Button(root, text="Find Audio", font=('Helvetica', 18), width=bw, command=find_audio)
 #find_audio_button.place(x=width/8*6, y=height/11*1, anchor=CENTER)
 pause_button = Button(root, text="Pause", font=('Helvetica', 18), width=bw)
-pause_button.place(x=width/8*6, y=height/11*7.75, anchor=CENTER)
+pause_button.place(x=width/3, y=height/10*9, anchor=CENTER)
 skip_button = Button(root, text="Skip", font=('Helvetica', 18), width=bw)
-skip_button.place(x=width/8*6, y=height/11*9, anchor=CENTER)
+skip_button.place(x=width/3*2, y=height/10*9, anchor=CENTER)
 
 # param_entry = Entry(root, width=30, font=('Lucida Console', 14))
 # param_entry.place(x=width/8*6, y=height/11*10, anchor=CENTER)
@@ -279,7 +279,7 @@ skip_button.place(x=width/8*6, y=height/11*9, anchor=CENTER)
 
 fair_img = PhotoImage(file=project_dir+'\\bin\\favicon.ppm')
 fair_img_label = Label(image=fair_img, width=194, height=194)
-fair_img_label.place(x=width/8*6, y=150, anchor=CENTER)
+#fair_img_label.place(x=width/8*6, y=150, anchor=CENTER)
 
 error_msg = None
 def error_msg_close():
@@ -292,10 +292,10 @@ while True:
     sleep(0.01)
 
     time_label.configure(text=get_time().replace('am', ' AM').replace('pm', ' PM'))
-    config_file_label.configure(text='Loaded: '+configfile.split('/')[-1])
+    config_file_label.configure(text='Show: '+configfile.split('/')[-1])
     prompt_label.configure(text=prompt)
     timer_label.configure(text=current_timer.get_time_str())
-    timer_type_label.configure(text=('Counting down.' if isinstance(current_timer, Countdown) else 'Counting up.' if isinstance(current_timer, Countup) else 'Holding.') + ' (Line %s)' % i)
+    timer_type_label.configure(text=('Counting down.' if isinstance(current_timer, Countdown) else 'Counting up.' if isinstance(current_timer, Countup) else 'Holding.'))# + ' (Line %s)' % i)
     skip_button.configure(text='Skip', command=skip)
     if isinstance(current_timer, Countup):
         skip_button.configure(text='Stop', command=stop)
