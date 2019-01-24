@@ -182,24 +182,32 @@ paused = False
 skipped = False
 
 root = Tk()
+root.iconbitmap(ico)
+
 width = 1000
 height = 700
+# root = Toplevel(base_root)
 root.geometry('%sx%s'%(width,height))
 root.title('Stage Timer')
 root.configure(background='black')
-root.iconbitmap(ico)
 root.focus_force()
 
-time_label = Label(root, fg='#0F0', bg='black', font=('Helvetica', 50))
-time_label.place(x=width/2, y=height/10*2, anchor=CENTER)
+time_label_fs = 50
+prompt_label_fs = 50
+timer_label_fs = 160
+config_file_label_fs = 16
+timer_type_label_fs = 20
+
+time_label = Label(root, fg='#0F0', bg='black', font=('Helvetica', time_label_fs))
+time_label.place(relx=1/2, rely=1/5, anchor=CENTER)
 prompt_label = Label(root, fg='#F00', bg='black', font=('Helvetica', 50))
-prompt_label.place(x=width/2, y=height/10*7, anchor=CENTER)
+prompt_label.place(relx=1/2, rely=7/10, anchor=CENTER)
 timer_label = Label(root, fg='#02F', bg='black', font=('Helvetica', 160))
-timer_label.place(x=width/2, y=height/2*0.9, anchor=CENTER)
+timer_label.place(relx=1/2, rely=9/20, anchor=CENTER)
 config_file_label = Label(root, fg='white', bg='black', font=('Helvetica', 16))
-config_file_label.place(x=width/2, y=height/10*8, anchor=CENTER)
+config_file_label.place(relx=1/2, rely=8/10, anchor=CENTER)
 timer_type_label = Label(root, fg='white', bg='black', font=('Helvetica', 20))
-timer_type_label.place(x=width/2, y=height/10*6, anchor=CENTER)
+timer_type_label.place(relx=1/2, rely=6/10, anchor=CENTER)
 
 
 def load_cfg():
@@ -261,17 +269,20 @@ def stop():
     current_timer.stop()
     current_timer = DeadTimer()
 
-bw = 10
-load_cfg_button = Button(root, text="Load Show", font=('Helvetica', 8), width=bw, command=load_cfg)
-load_cfg_button.place(x=width/2, y=height/10*8.5, anchor=CENTER)
+button_width = 10
+load_cfg_button_fs = 8
+pause_button_fs = skip_button_fs = 18
+
+load_cfg_button = Button(root, text="Load Show", font=('Helvetica', 8), width=button_width, command=load_cfg)
+load_cfg_button.place(relx=1/2, rely=17/20, anchor=CENTER)
 #check_logs_button = Button(root, text="Set Log", font=('Helvetica', 18), width=bw, command=switch_logfile)
 #check_logs_button.place(x=width/8*6, y=height/11*5, anchor=CENTER)
 #find_audio_button = Button(root, text="Find Audio", font=('Helvetica', 18), width=bw, command=find_audio)
 #find_audio_button.place(x=width/8*6, y=height/11*1, anchor=CENTER)
-pause_button = Button(root, text="Pause", font=('Helvetica', 18), width=bw)
-pause_button.place(x=width/3, y=height/10*9, anchor=CENTER)
-skip_button = Button(root, text="Skip", font=('Helvetica', 18), width=bw)
-skip_button.place(x=width/3*2, y=height/10*9, anchor=CENTER)
+pause_button = Button(root, text="Pause", font=('Helvetica', 18), width=button_width)
+pause_button.place(relx=1/3, rely=9/10, anchor=CENTER)
+skip_button = Button(root, text="Skip", font=('Helvetica', 18), width=button_width)
+skip_button.place(relx=2/3, rely=9/10, anchor=CENTER)
 
 # param_entry = Entry(root, width=30, font=('Lucida Console', 14))
 # param_entry.place(x=width/8*6, y=height/11*10, anchor=CENTER)
@@ -289,7 +300,22 @@ def error_msg_close():
     error_msg = None
 
 while True:
-    sleep(0.01)
+    sleep(0.02)
+
+    w = root.winfo_width()
+    h = root.winfo_height()
+    hdif = h/height
+    wdif = w/width
+    fac = min(hdif, wdif) * 0.9 + max(hdif, wdif) * 0.1
+    time_label.config(font=('Helvetica', int(time_label_fs*fac)))
+    prompt_label.config(font=('Helvetica', int(prompt_label_fs * fac)))
+    timer_label.config(font=('Helvetica', int(timer_label_fs * fac)))
+    config_file_label.config(font=('Helvetica', int(config_file_label_fs * fac)))
+    timer_type_label.config(font=('Helvetica', int(timer_type_label_fs * fac)))
+
+    load_cfg_button.config(font=('Helvetica', int(load_cfg_button_fs * fac)), width=int(button_width))# * fac))
+    skip_button.config(font=('Helvetica', int(skip_button_fs * fac)), width=int(button_width))# * fac))
+    pause_button.config(font=('Helvetica', int(pause_button_fs * fac)), width=int(button_width))# * fac))
 
     time_label.configure(text=get_time().replace('am', ' AM').replace('pm', ' PM'))
     config_file_label.configure(text='Show: '+configfile.split('/')[-1])

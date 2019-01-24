@@ -16,7 +16,7 @@ if sys.platform == "win32":
 
 setup(
     name="Mr. Fair's Special Timer",
-    version="1.4",
+    version="1.6",
     description="Mr. Fairs stage crew timer. Made by Yovel Key-Cohen '21.",
     options={"build_exe": build_exe_options},
     executables=[Executable("main.py", base=base, icon='bin/favicon.ico')])
