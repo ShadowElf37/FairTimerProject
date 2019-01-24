@@ -8,10 +8,13 @@ import os
 import audio
 from traceback import format_exc
 from math import floor
+from fractions import Fraction
 
 project_dir = os.getcwd()
 showfiles = project_dir+'\\ShowFiles\\'
 ico = project_dir+'\\bin\\favicon.ico'
+
+FONT = 'Helvetica'
 
 # Read Config
 root = Tk()
@@ -192,22 +195,53 @@ root.title('Stage Timer')
 root.configure(background='black')
 root.focus_force()
 
+
 time_label_fs = 50
 prompt_label_fs = 50
 timer_label_fs = 160
-config_file_label_fs = 16
+config_file_label_fs = 14
 timer_type_label_fs = 20
 
-time_label = Label(root, fg='#0F0', bg='black', font=('Helvetica', time_label_fs))
-time_label.place(relx=1/2, rely=1/5, anchor=CENTER)
-prompt_label = Label(root, fg='#F00', bg='black', font=('Helvetica', 50))
+time_label = Label(root, fg='#0F0', bg='black', font=(FONT, time_label_fs))
+time_label.place(relx=1/2, rely=3/20, anchor=CENTER)
+prompt_label = Label(root, fg='#F00', bg='black', font=(FONT, 50))
 prompt_label.place(relx=1/2, rely=7/10, anchor=CENTER)
-timer_label = Label(root, fg='#02F', bg='black', font=('Helvetica', 160))
+timer_label = Label(root, fg='#02F', bg='black', font=(FONT, 160))
 timer_label.place(relx=1/2, rely=9/20, anchor=CENTER)
-config_file_label = Label(root, fg='white', bg='black', font=('Helvetica', 16))
+config_file_label = Label(root, fg='white', bg='black', font=(FONT, 16))
 config_file_label.place(relx=1/2, rely=8/10, anchor=CENTER)
-timer_type_label = Label(root, fg='white', bg='black', font=('Helvetica', 20))
-timer_type_label.place(relx=1/2, rely=6/10, anchor=CENTER)
+timer_type_label = Label(root, fg='white', bg='black', font=(FONT, 20))
+timer_type_label.place(relx=1/2, rely=12/20, anchor=CENTER)
+
+
+fullscreen = False
+alt_tabbed = False
+old_window_pos = root.winfo_x(), root.winfo_y()
+
+def alt_tab(*args):
+    global alt_tabbed, fullscreen
+    if fullscreen:
+        alt_tabbed = True
+        toggle_fullscreen()
+
+def toggle_fullscreen(*args):
+    global root, fullscreen, old_window_pos, alt_tabbed
+    if not fullscreen:
+        old_window_pos = root.winfo_x(), root.winfo_y()
+        root.geometry('{}x{}+0+0'.format(root.winfo_screenwidth(), root.winfo_screenheight()))
+        root.overrideredirect(1)  # borderless
+        fullscreen = True
+    elif alt_tabbed:
+        root.overrideredirect(0)
+        alt_tabbed = False
+    else:
+        root.geometry('{}x{}+{}+{}'.format(width, height, *old_window_pos))
+        root.overrideredirect(0)
+        root.focus_force()
+        fullscreen = False
+root.bind('<F5>', toggle_fullscreen)
+root.bind('<Alt_L>', alt_tab)
+root.bind('<Win_L>', alt_tab)
 
 
 def load_cfg():
@@ -269,28 +303,45 @@ def stop():
     current_timer.stop()
     current_timer = DeadTimer()
 
+
 button_width = 10
 load_cfg_button_fs = 8
 pause_button_fs = skip_button_fs = 18
 
-load_cfg_button = Button(root, text="Load Show", font=('Helvetica', 8), width=button_width, command=load_cfg)
+load_cfg_button = Button(root, text="Load Show", font=(FONT, 8), width=button_width, command=load_cfg)
 load_cfg_button.place(relx=1/2, rely=17/20, anchor=CENTER)
-#check_logs_button = Button(root, text="Set Log", font=('Helvetica', 18), width=bw, command=switch_logfile)
+#check_logs_button = Button(root, text="Set Log", font=(FONT, 18), width=bw, command=switch_logfile)
 #check_logs_button.place(x=width/8*6, y=height/11*5, anchor=CENTER)
-#find_audio_button = Button(root, text="Find Audio", font=('Helvetica', 18), width=bw, command=find_audio)
+#find_audio_button = Button(root, text="Find Audio", font=(FONT, 18), width=bw, command=find_audio)
 #find_audio_button.place(x=width/8*6, y=height/11*1, anchor=CENTER)
-pause_button = Button(root, text="Pause", font=('Helvetica', 18), width=button_width)
-pause_button.place(relx=1/3, rely=9/10, anchor=CENTER)
-skip_button = Button(root, text="Skip", font=('Helvetica', 18), width=button_width)
-skip_button.place(relx=2/3, rely=9/10, anchor=CENTER)
+pause_button = Button(root, text="Pause", font=(FONT, 18), width=button_width)
+pause_button.place(relx=2/3, rely=9/10, anchor=CENTER)
+skip_button = Button(root, text="Skip", font=(FONT, 18), width=button_width)
+skip_button.place(relx=1/3, rely=9/10, anchor=CENTER)
 
 # param_entry = Entry(root, width=30, font=('Lucida Console', 14))
 # param_entry.place(x=width/8*6, y=height/11*10, anchor=CENTER)
 # param_entry.insert(0, 'Enter file names here')
 
 fair_img = PhotoImage(file=project_dir+'\\bin\\favicon.ppm')
-fair_img_label = Label(image=fair_img, width=194, height=194)
-#fair_img_label.place(x=width/8*6, y=150, anchor=CENTER)
+fair_img_label1 = Label(image=fair_img, width=194, height=194)
+fair_img_label2 = Label(image=fair_img, width=194, height=194)
+#fair_img_label1.place(relx=0, rely=0, anchor=NW)
+#fair_img_label2.place(relx=1, rely=0, anchor=NE)
+fair_hidden = True
+
+def toggle_fair_img(*args):
+    global root, fair_img_label1, fair_img_label2, fair_hidden
+    if not fair_hidden:
+        fair_hidden = True
+        fair_img_label1.place_forget()
+        fair_img_label2.place_forget()
+    else:
+        fair_hidden = False
+        fair_img_label1.place(relx=0, rely=0, anchor=NW)
+        fair_img_label2.place(relx=1, rely=0, anchor=NE)
+root.bind('<Key-period>', toggle_fair_img)
+
 
 error_msg = None
 def error_msg_close():
@@ -299,6 +350,15 @@ def error_msg_close():
     root.focus_force()
     error_msg = None
 
+
+def window_close(*args):
+    root.destroy()
+    log.close()
+    print('Application exited by user.')
+    exit(0)
+root.protocol("WM_DELETE_WINDOW", window_close)
+
+old_wh_dif = 1,1
 while True:
     sleep(0.02)
 
@@ -306,16 +366,26 @@ while True:
     h = root.winfo_height()
     hdif = h/height
     wdif = w/width
-    fac = min(hdif, wdif) * 0.9 + max(hdif, wdif) * 0.1
-    time_label.config(font=('Helvetica', int(time_label_fs*fac)))
-    prompt_label.config(font=('Helvetica', int(prompt_label_fs * fac)))
-    timer_label.config(font=('Helvetica', int(timer_label_fs * fac)))
-    config_file_label.config(font=('Helvetica', int(config_file_label_fs * fac)))
-    timer_type_label.config(font=('Helvetica', int(timer_type_label_fs * fac)))
+    fac = min(hdif, wdif) * 1.0 + max(hdif, wdif) * 0
 
-    load_cfg_button.config(font=('Helvetica', int(load_cfg_button_fs * fac)), width=int(button_width))# * fac))
-    skip_button.config(font=('Helvetica', int(skip_button_fs * fac)), width=int(button_width))# * fac))
-    pause_button.config(font=('Helvetica', int(pause_button_fs * fac)), width=int(button_width))# * fac))
+    time_label.config(font=(FONT, int(time_label_fs*fac)))
+    prompt_label.config(font=(FONT, int(prompt_label_fs * fac)))
+    timer_label.config(font=(FONT, int(timer_label_fs * fac)))
+    config_file_label.config(font=(FONT, int(config_file_label_fs * fac)))
+    timer_type_label.config(font=(FONT, int(timer_type_label_fs * fac)))
+
+    load_cfg_button.config(font=(FONT, int(load_cfg_button_fs * fac)), width=int(button_width))# * fac))
+    skip_button.config(font=(FONT, int(skip_button_fs * fac)), width=int(button_width))# * fac))
+    pause_button.config(font=(FONT, int(pause_button_fs * fac)), width=int(button_width))# * fac))
+
+    if old_wh_dif != (hdif, wdif) and not fair_hidden:  # Zoom/subsample are really expensive functions for some reason, so the less we have to run them, the better
+        ffac = Fraction(fac).limit_denominator(23)
+        tempimg = fair_img.zoom(ffac.numerator).subsample(ffac.denominator)
+        fair_img_label1.config(image=tempimg, width=int(194*fac), height=int(194*fac))
+        fair_img_label2.config(image=tempimg, width=int(194*fac), height=int(194*fac))
+
+        old_wh_dif = hdif, wdif
+
 
     time_label.configure(text=get_time().replace('am', ' AM').replace('pm', ' PM'))
     config_file_label.configure(text='Show: '+configfile.split('/')[-1])
