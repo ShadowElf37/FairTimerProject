@@ -366,7 +366,7 @@ while True:
     h = root.winfo_height()
     hdif = h/height
     wdif = w/width
-    fac = min(hdif, wdif) * 1.0 + max(hdif, wdif) * 0
+    fac = min(hdif, wdif) * 1.0 + max(hdif, wdif) * 0.0
 
     time_label.config(font=(FONT, int(time_label_fs*fac)))
     prompt_label.config(font=(FONT, int(prompt_label_fs * fac)))
@@ -379,7 +379,7 @@ while True:
     pause_button.config(font=(FONT, int(pause_button_fs * fac)), width=int(button_width))# * fac))
 
     if old_wh_dif != (hdif, wdif) and not fair_hidden:  # Zoom/subsample are really expensive functions for some reason, so the less we have to run them, the better
-        ffac = Fraction(fac).limit_denominator(23)
+        ffac = Fraction(fac).limit_denominator(19)
         tempimg = fair_img.zoom(ffac.numerator).subsample(ffac.denominator)
         fair_img_label1.config(image=tempimg, width=int(194*fac), height=int(194*fac))
         fair_img_label2.config(image=tempimg, width=int(194*fac), height=int(194*fac))
