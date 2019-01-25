@@ -323,6 +323,11 @@ skip_button.place(relx=1/3, rely=9/10, anchor=CENTER)
 # param_entry.place(x=width/8*6, y=height/11*10, anchor=CENTER)
 # param_entry.insert(0, 'Enter file names here')
 
+f5_label = Label(text='F5 - Fullscreen', font=('Helvetica', 20), bg='#000', fg='#151515')
+f5_label.place(relx=1, rely=0, anchor=NE)
+f5_label.bind("<Button-1>", lambda *args: f5_label.place_forget())
+f5_label.bind("<Button-2>", lambda *args: f5_label.place_forget())
+
 fair_img = PhotoImage(file=project_dir+'\\bin\\favicon.ppm')
 fair_img_label1 = Label(image=fair_img, width=194, height=194)
 fair_img_label2 = Label(image=fair_img, width=194, height=194)
@@ -340,7 +345,7 @@ def toggle_fair_img(*args):
         fair_hidden = False
         fair_img_label1.place(relx=0, rely=0, anchor=NW)
         fair_img_label2.place(relx=1, rely=0, anchor=NE)
-root.bind('<Key-period>', toggle_fair_img)
+root.bind('<Key-f>', lambda *x: root.bind('<Key-a>', lambda *x: root.bind('<Key-i>', lambda *x: root.bind('<Key-r>', lambda *x: root.bind('<Key-period>', toggle_fair_img)))))
 
 
 error_msg = None
@@ -360,50 +365,51 @@ root.protocol("WM_DELETE_WINDOW", window_close)
 
 old_wh_dif = 1,1
 while True:
-    sleep(0.02)
-
-    w = root.winfo_width()
-    h = root.winfo_height()
-    hdif = h/height
-    wdif = w/width
-    fac = min(hdif, wdif) * 1.0 + max(hdif, wdif) * 0.0
-
-    time_label.config(font=(FONT, int(time_label_fs*fac)))
-    prompt_label.config(font=(FONT, int(prompt_label_fs * fac)))
-    timer_label.config(font=(FONT, int(timer_label_fs * fac)))
-    config_file_label.config(font=(FONT, int(config_file_label_fs * fac)))
-    timer_type_label.config(font=(FONT, int(timer_type_label_fs * fac)))
-
-    load_cfg_button.config(font=(FONT, int(load_cfg_button_fs * fac)), width=int(button_width))# * fac))
-    skip_button.config(font=(FONT, int(skip_button_fs * fac)), width=int(button_width))# * fac))
-    pause_button.config(font=(FONT, int(pause_button_fs * fac)), width=int(button_width))# * fac))
-
-    if old_wh_dif != (hdif, wdif) and not fair_hidden:  # Zoom/subsample are really expensive functions for some reason, so the less we have to run them, the better
-        ffac = Fraction(fac).limit_denominator(19)
-        tempimg = fair_img.zoom(ffac.numerator).subsample(ffac.denominator)
-        fair_img_label1.config(image=tempimg, width=int(194*fac), height=int(194*fac))
-        fair_img_label2.config(image=tempimg, width=int(194*fac), height=int(194*fac))
-
-        old_wh_dif = hdif, wdif
-
-
-    time_label.configure(text=get_time().replace('am', ' AM').replace('pm', ' PM'))
-    config_file_label.configure(text='Show: '+configfile.split('/')[-1])
-    prompt_label.configure(text=prompt)
-    timer_label.configure(text=current_timer.get_time_str())
-    timer_type_label.configure(text=('Counting down.' if isinstance(current_timer, Countdown) else 'Counting up.' if isinstance(current_timer, Countup) else 'Holding.'))# + ' (Line %s)' % i)
-    skip_button.configure(text='Skip', command=skip)
-    if isinstance(current_timer, Countup):
-        skip_button.configure(text='Stop', command=stop)
-    pause_button.configure(text='Pause', command=pause)
-    if skipped and not isinstance(current_timer, DeadTimer) and not paused:
-        pause()
-    if skipped and not isinstance(current_timer, DeadTimer):
-        pause_button.configure(text='Start', command=resume)
-    elif paused and not skipped:
-        pause_button.configure(text='Resume', command=resume)
-
     try:
+        sleep(0.02)
+
+        w = root.winfo_width()
+        h = root.winfo_height()
+        hdif = h/height
+        wdif = w/width
+        fac = min(hdif, wdif) * 1.0 + max(hdif, wdif) * 0.0
+
+        time_label.config(font=(FONT, int(time_label_fs*fac)))
+        prompt_label.config(font=(FONT, int(prompt_label_fs * fac)))
+        timer_label.config(font=(FONT, int(timer_label_fs * fac)))
+        config_file_label.config(font=(FONT, int(config_file_label_fs * fac)))
+        timer_type_label.config(font=(FONT, int(timer_type_label_fs * fac)))
+
+        load_cfg_button.config(font=(FONT, int(load_cfg_button_fs * fac)), width=int(button_width))# * fac))
+        skip_button.config(font=(FONT, int(skip_button_fs * fac)), width=int(button_width))# * fac))
+        pause_button.config(font=(FONT, int(pause_button_fs * fac)), width=int(button_width))# * fac))
+
+        if old_wh_dif != (hdif, wdif) and not fair_hidden:  # Zoom/subsample are really expensive functions for some reason, so the less we have to run them, the better
+            ffac = Fraction(fac).limit_denominator(19)
+            tempimg = fair_img.zoom(ffac.numerator).subsample(ffac.denominator)
+            fair_img_label1.config(image=tempimg, width=int(194*fac), height=int(194*fac))
+            fair_img_label2.config(image=tempimg, width=int(194*fac), height=int(194*fac))
+
+            old_wh_dif = hdif, wdif
+
+
+        time_label.configure(text=get_time().replace('am', ' AM').replace('pm', ' PM'))
+        config_file_label.configure(text='Show: '+configfile.split('/')[-1])
+        prompt_label.configure(text=prompt)
+        timer_label.configure(text=current_timer.get_time_str())
+        timer_type_label.configure(text=('Counting down.' if isinstance(current_timer, Countdown) else 'Counting up.' if isinstance(current_timer, Countup) else 'Holding.'))# + ' (Line %s)' % i)
+        skip_button.configure(text='Skip', command=skip)
+        if isinstance(current_timer, Countup):
+            skip_button.configure(text='Stop', command=stop)
+        pause_button.configure(text='Pause', command=pause)
+        if skipped and not isinstance(current_timer, DeadTimer) and not paused:
+            pause()
+        if skipped and not isinstance(current_timer, DeadTimer):
+            pause_button.configure(text='Start', command=resume)
+        elif paused and not skipped:
+            pause_button.configure(text='Resume', command=resume)
+
+
         fps = 24
         root.update()
         root.update_idletasks()
@@ -443,6 +449,8 @@ while True:
                     if arg.find('(') != -1:
                         t = arg[:arg.find('(')]
                         s = arg[arg.find('(')+1:arg.find(')', arg.find(')')+1)]
+                        if arg.count(')') > 1:
+                            raise SyntaxError('You forgot a $ in your timed commands on line %d' % (i+1))
                         current_timer.timed_command(t, s)
                     else:
                         if arg.strip() == 'auto':
