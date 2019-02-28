@@ -1,5 +1,6 @@
 1/14/19 - 1/24/19
 Stage Timer v2.0
+Github: https://github.com/ShadowElf37/FairTimerProject
 
 Stage management tool created by Yovel Key-Cohen '21.
 This application was not made by Mr. Fair. In fact he was quite demanding.
